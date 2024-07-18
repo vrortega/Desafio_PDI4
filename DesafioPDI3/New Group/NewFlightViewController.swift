@@ -181,10 +181,10 @@ class NewFlightViewController: UIViewController {
         button.setTitle("Decolar", for: .normal)
         button.setImage(UIImage(systemName: "airplane"), for: .normal)
         button.tintColor = .white
-        button.backgroundColor = .systemGreen // Botão verde
+        button.backgroundColor = .systemGreen 
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(NewFlightViewController.self, action: #selector(takeoffButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(takeoffButtonTapped), for: .touchUpInside)
         return button
     }()
     
