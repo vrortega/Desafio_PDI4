@@ -16,6 +16,7 @@
 		4E449CC42C481E9F00F9AB9A /* NewFlightViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CC32C481E9F00F9AB9A /* NewFlightViewController.swift */; };
 		4E449CC62C498A9D00F9AB9A /* PassengersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CC52C498A9D00F9AB9A /* PassengersViewController.swift */; };
 		4E449CC92C498B3900F9AB9A /* CrewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CC82C498B3900F9AB9A /* CrewViewController.swift */; };
+		4E449CCB2C4993B100F9AB9A /* Passenger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CCA2C4993B100F9AB9A /* Passenger.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		4E449CC32C481E9F00F9AB9A /* NewFlightViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFlightViewController.swift; sourceTree = "<group>"; };
 		4E449CC52C498A9D00F9AB9A /* PassengersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassengersViewController.swift; sourceTree = "<group>"; };
 		4E449CC82C498B3900F9AB9A /* CrewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrewViewController.swift; sourceTree = "<group>"; };
+		4E449CCA2C4993B100F9AB9A /* Passenger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Passenger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 			children = (
 				4E449CAD2C481E0E00F9AB9A /* AppDelegate.swift */,
 				4E449CAF2C481E0E00F9AB9A /* SceneDelegate.swift */,
+				4E449CCC2C4993BA00F9AB9A /* Models */,
 				4E449CC72C498B1300F9AB9A /* New Group */,
 				4E449CB32C481E0E00F9AB9A /* Main.storyboard */,
 				4E449CB62C481E1400F9AB9A /* Assets.xcassets */,
@@ -82,6 +85,14 @@
 				4E449CC52C498A9D00F9AB9A /* PassengersViewController.swift */,
 			);
 			path = "New Group";
+			sourceTree = "<group>";
+		};
+		4E449CCC2C4993BA00F9AB9A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4E449CCA2C4993B100F9AB9A /* Passenger.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E449CC62C498A9D00F9AB9A /* PassengersViewController.swift in Sources */,
+				4E449CCB2C4993B100F9AB9A /* Passenger.swift in Sources */,
 				4E449CC92C498B3900F9AB9A /* CrewViewController.swift in Sources */,
 				4E449CAE2C481E0E00F9AB9A /* AppDelegate.swift in Sources */,
 				4E449CC22C481E7700F9AB9A /* FlightsViewController.swift in Sources */,
