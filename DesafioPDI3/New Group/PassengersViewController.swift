@@ -33,7 +33,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(embarkButtonTapped), for: .touchUpInside)
+        button.addTarget(PassengersViewController.self, action: #selector(embarkButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -107,14 +107,9 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
             return
         }
         
-        // Add new passenger to the list
         passengers.append(newPassenger)
-        
-        // Clear text fields
         nameTextField.text = ""
         ageTextField.text = ""
-        
-        // Update UI
         updateUI()
     }
     
