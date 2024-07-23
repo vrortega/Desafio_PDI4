@@ -7,7 +7,15 @@
 
 import UIKit
 
+
+protocol CrewViewControllerDelegate: AnyObject {
+    func didUpdateCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant])
+}
+
+
 class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    weak var delegate: CrewViewControllerDelegate?
     
     private let roleSegmentedControl: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["Piloto", "Comissário"])

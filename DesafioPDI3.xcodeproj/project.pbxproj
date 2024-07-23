@@ -19,6 +19,7 @@
 		4E449CCB2C4993B100F9AB9A /* Passenger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CCA2C4993B100F9AB9A /* Passenger.swift */; };
 		4E449CCE2C4E8CDB00F9AB9A /* Pilot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CCD2C4E8CDB00F9AB9A /* Pilot.swift */; };
 		4E449CD02C4E8E8E00F9AB9A /* FlightAttendant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CCF2C4E8E8E00F9AB9A /* FlightAttendant.swift */; };
+		4EB73D452C4FE6C900F5024C /* Flight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB73D442C4FE6C900F5024C /* Flight.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		4E449CCA2C4993B100F9AB9A /* Passenger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Passenger.swift; sourceTree = "<group>"; };
 		4E449CCD2C4E8CDB00F9AB9A /* Pilot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pilot.swift; sourceTree = "<group>"; };
 		4E449CCF2C4E8E8E00F9AB9A /* FlightAttendant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightAttendant.swift; sourceTree = "<group>"; };
+		4EB73D442C4FE6C900F5024C /* Flight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flight.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,7 +88,6 @@
 				4E449CC12C481E7700F9AB9A /* FlightsViewController.swift */,
 				4E449CC32C481E9F00F9AB9A /* NewFlightViewController.swift */,
 				4E449CC82C498B3900F9AB9A /* CrewViewController.swift */,
-				4E449CCF2C4E8E8E00F9AB9A /* FlightAttendant.swift */,
 				4E449CC52C498A9D00F9AB9A /* PassengersViewController.swift */,
 			);
 			path = "New Group";
@@ -95,7 +96,9 @@
 		4E449CCC2C4993BA00F9AB9A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				4EB73D442C4FE6C900F5024C /* Flight.swift */,
 				4E449CCA2C4993B100F9AB9A /* Passenger.swift */,
+				4E449CCF2C4E8E8E00F9AB9A /* FlightAttendant.swift */,
 				4E449CCD2C4E8CDB00F9AB9A /* Pilot.swift */,
 			);
 			path = Models;
@@ -175,6 +178,7 @@
 				4E449CC62C498A9D00F9AB9A /* PassengersViewController.swift in Sources */,
 				4E449CCB2C4993B100F9AB9A /* Passenger.swift in Sources */,
 				4E449CC92C498B3900F9AB9A /* CrewViewController.swift in Sources */,
+				4EB73D452C4FE6C900F5024C /* Flight.swift in Sources */,
 				4E449CD02C4E8E8E00F9AB9A /* FlightAttendant.swift in Sources */,
 				4E449CAE2C481E0E00F9AB9A /* AppDelegate.swift in Sources */,
 				4E449CC22C481E7700F9AB9A /* FlightsViewController.swift in Sources */,

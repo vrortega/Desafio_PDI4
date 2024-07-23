@@ -1,4 +1,4 @@
-//
+///
 //  NewFlightViewController.swift
 //  DesafioPDI3
 //
@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 class NewFlightViewController: UIViewController {
+
+    // MARK: - UI Components
 
     private let originTextField: UITextField = {
         let textField = UITextField()
@@ -38,7 +40,7 @@ class NewFlightViewController: UIViewController {
         stepper.minimumValue = 1
         stepper.value = 1
         stepper.translatesAutoresizingMaskIntoConstraints = false
-        stepper.addTarget(NewFlightViewController.self, action: #selector(stepperValueChanged), for: .valueChanged)
+        stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
         return stepper
     }()
     
@@ -120,7 +122,7 @@ class NewFlightViewController: UIViewController {
     
     private let passengerView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(white: 0.9, alpha: 1) // Cor cinza claro
+        view.backgroundColor = UIColor(white: 0.9, alpha: 1)
         view.layer.cornerRadius = 8
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -128,7 +130,7 @@ class NewFlightViewController: UIViewController {
     
     private let crewView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(white: 0.9, alpha: 1) // Cor cinza claro
+        view.backgroundColor = UIColor(white: 0.9, alpha: 1)
         view.layer.cornerRadius = 8
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -137,6 +139,7 @@ class NewFlightViewController: UIViewController {
     private let passengerLabel: UILabel = {
         let label = UILabel()
         label.text = "Nenhum passageiro adicionado"
+        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -144,6 +147,7 @@ class NewFlightViewController: UIViewController {
     private let crewLabel: UILabel = {
         let label = UILabel()
         label.text = "Nenhum tripulante adicionado"
+        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -181,12 +185,21 @@ class NewFlightViewController: UIViewController {
         button.setTitle("Decolar", for: .normal)
         button.setImage(UIImage(systemName: "airplane"), for: .normal)
         button.tintColor = .white
-        button.backgroundColor = .systemGreen 
+        button.backgroundColor = .systemGreen
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(takeoffButtonTapped), for: .touchUpInside)
         return button
     }()
+    
+    // MARK: - Data Models
+    
+    private var passengers: [Passenger] = []
+    private var pilots: [Pilot] = []
+    private var coPilots: [CoPilot] = []
+    private var flightAttendants: [FlightAttendant] = []
+    
+    // MARK: - Lifecycle Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -197,6 +210,17 @@ class NewFlightViewController: UIViewController {
         setupLayout()
         setupGestureRecognizers()
     }
+    
+    private func setupGestureRecognizers() {
+           let passengerTapGesture = UITapGestureRecognizer(target: self, action: #selector(passengerViewTapped))
+           passengerView.addGestureRecognizer(passengerTapGesture)
+           
+           let crewTapGesture = UITapGestureRecognizer(target: self, action: #selector(crewViewTapped))
+           crewView.addGestureRecognizer(crewTapGesture)
+       }
+       
+    
+    // MARK: - Layout Setup
     
     private func setupLayout() {
         let originStackView = UIStackView(arrangedSubviews: [originIcon, originTextField])
@@ -245,7 +269,7 @@ class NewFlightViewController: UIViewController {
             rightArrowIcon1.trailingAnchor.constraint(equalTo: passengerView.trailingAnchor, constant: -8),
             rightArrowIcon1.centerYAnchor.constraint(equalTo: passengerView.centerYAnchor),
             rightArrowIcon1.widthAnchor.constraint(equalToConstant: 30),
-            rightArrowIcon1.heightAnchor.constraint(equalToConstant: 30), 
+            rightArrowIcon1.heightAnchor.constraint(equalToConstant: 30),
         ])
         
         crewView.addSubview(personIcon2)
@@ -307,33 +331,83 @@ class NewFlightViewController: UIViewController {
             takeoffButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
     }
-    
-    
-    private func setupGestureRecognizers() {
-        let passengerTapGesture = UITapGestureRecognizer(target: self, action: #selector(passengerViewTapped))
-        passengerView.addGestureRecognizer(passengerTapGesture)
         
-        let crewTapGesture = UITapGestureRecognizer(target: self, action: #selector(crewViewTapped))
-        crewView.addGestureRecognizer(crewTapGesture)
-    }
+    // MARK: - Button Actions
     
     @objc private func stepperValueChanged() {
         capacityLabel.text = "Capacidade de \(Int(stepper.value)) pessoa(s)"
     }
     
     @objc private func takeoffButtonTapped() {
-        let alert = UIAlertController(title: "Sucesso", message: "Embarque feito com sucesso", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+        if validateFlight() {
+            let flight = Flight(
+                origin: originTextField.text ?? "",
+                destination: destinationTextField.text ?? "",
+                capacity: Int(stepper.value),
+                departureDate: departureDatePicker.date,
+                returnDate: oneWaySwitch.isOn ? nil : returnDatePicker.date
+            )
+            
+            FlightManager.shared.addFlight(flight)
+            
+            let alert = UIAlertController(title: "Sucesso", message: "Voo adicionado com sucesso", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                self.navigationController?.popToRootViewController(animated: true)
+            }))
+            present(alert, animated: true, completion: nil)
+        }
     }
+
     
     @objc private func passengerViewTapped() {
         let passengerViewController = PassengersViewController()
+        passengerViewController.delegate = self
         navigationController?.pushViewController(passengerViewController, animated: true)
     }
     
     @objc private func crewViewTapped() {
         let crewViewController = CrewViewController()
+        crewViewController.delegate = self
         navigationController?.pushViewController(crewViewController, animated: true)
     }
+    
+    // MARK: - Validation
+    
+    private func validateFlight() -> Bool {
+        var errorMessage: String?
+        
+//        if passengers.isEmpty {
+//            errorMessage = "Pelo menos um passageiro deve estar presente."
+//        } else if pilots.isEmpty {
+//            errorMessage = "É necessário um piloto."
+//        } else if coPilots.isEmpty {
+//            errorMessage = "É necessário um co-piloto."
+//        } else if flightAttendants.count > 3 {
+//            errorMessage = "No máximo três comissários"
+//        }
+//
+        if let errorMessage = errorMessage {
+            let alert = UIAlertController(title: "Erro", message: errorMessage, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return false
+        }
+        
+        return true
+    }
 }
+
+extension NewFlightViewController: PassengersViewControllerDelegate, CrewViewControllerDelegate {
+    func didUpdatePassengers(_ passengers: [Passenger]) {
+        self.passengers = passengers
+        passengerLabel.text = passengers.isEmpty ? "Nenhum passageiro adicionado" : "\(passengers.count) passageiro(s) adicionado(s)"
+    }
+    
+    func didUpdateCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant]) {
+        self.pilots = pilots
+        self.coPilots = coPilots
+        self.flightAttendants = flightAttendants
+        crewLabel.text = pilots.isEmpty && coPilots.isEmpty && flightAttendants.isEmpty ? "Nenhum tripulante adicionado" : "\(pilots.count + coPilots.count + flightAttendants.count) tripulante(s) adicionado(s)"
+    }
+}
+

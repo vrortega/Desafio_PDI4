@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol PassengersViewControllerDelegate: AnyObject {
+    func didUpdatePassengers(_ passengers: [Passenger])
+}
+
 class PassengersViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    weak var delegate: PassengersViewControllerDelegate?
     
     private let nameTextField: UITextField = {
         let textField = UITextField()
@@ -33,7 +39,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(PassengersViewController.self, action: #selector(embarkButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(embarkButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -91,7 +97,6 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         guard let name = nameTextField.text, !name.isEmpty,
               let ageText = ageTextField.text, !ageText.isEmpty,
               let age = Int(ageText) else {
-            // Display an alert if inputs are invalid
             let alert = UIAlertController(title: "Erro", message: "Por favor, insira um nome e uma idade válidos.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
