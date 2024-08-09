@@ -11,9 +11,14 @@ struct Flight {
     let origin: String
     let destination: String
     let capacity: Int
-    let departureDate: Date
-    let returnDate: Date?
+    //let departureDate: Date
+    //let returnDate: Date?
+    let pilots: [Pilot]
+    let coPilots: [CoPilot]
+    let flightAttendants: [FlightAttendant]
+    let passengers: [Passenger]
 }
+
 
 class FlightManager {
     static let shared = FlightManager()
