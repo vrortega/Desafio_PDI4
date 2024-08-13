@@ -7,7 +7,6 @@
 
 import UIKit
 
-
 protocol CrewViewControllerDelegate: AnyObject {
     func didUpdateCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant])
 }
@@ -77,9 +76,9 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return tableView
     }()
     
-    private var pilots: [Pilot] = []
-    private var coPilots: [CoPilot] = []
-    private var flightAttendants: [FlightAttendant] = []
+    var pilots: [Pilot] = []
+    var coPilots: [CoPilot] = []
+    var flightAttendants: [FlightAttendant] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,8 +112,8 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            roleSegmentedControl.heightAnchor.constraint(equalToConstant: 44),
-            nameTextField.heightAnchor.constraint(equalToConstant: 44),
+            roleSegmentedControl.heightAnchor.constraint(equalToConstant: 35),
+            nameTextField.heightAnchor.constraint(equalToConstant: 35),
             embarkButton.heightAnchor.constraint(equalToConstant: 44),
             crewTableView.heightAnchor.constraint(equalToConstant: 200)
         ])
@@ -163,6 +162,8 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         updateUI(for: roleSegmentedControl.selectedSegmentIndex)
         updateCrewTable()
+        
+        delegate?.didUpdateCrew(pilots: pilots, coPilots: coPilots, flightAttendants: flightAttendants)
     }
     
     private func updateCrewTable() {
@@ -194,9 +195,7 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         return cell
     }
-    
-    // MARK: - UITableViewDelegate
-    
+        
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             if indexPath.row < pilots.count {

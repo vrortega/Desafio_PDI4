@@ -58,7 +58,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         return tableView
     }()
     
-    private var passengers: [Passenger] = []
+    var passengers: [Passenger] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,8 +86,8 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            nameTextField.heightAnchor.constraint(equalToConstant: 44),
-            ageTextField.heightAnchor.constraint(equalToConstant: 44),
+            nameTextField.heightAnchor.constraint(equalToConstant: 35),
+            ageTextField.heightAnchor.constraint(equalToConstant: 35),
             embarkButton.heightAnchor.constraint(equalToConstant: 44),
             passengersTableView.heightAnchor.constraint(equalToConstant: 200)
         ])
@@ -116,6 +116,9 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         nameTextField.text = ""
         ageTextField.text = ""
         updateUI()
+        
+        delegate?.didUpdatePassengers(passengers)
+        
     }
     
     private func updateUI() {
@@ -123,9 +126,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         passengersTableView.isHidden = passengers.isEmpty
         passengersTableView.reloadData()
     }
-    
-    // MARK: - UITableViewDataSource
-    
+        
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return passengers.count
     }
@@ -136,9 +137,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         cell.textLabel?.text = "Nome: \(passenger.name), Idade: \(passenger.age)"
         return cell
     }
-    
-    // MARK: - UITableViewDelegate
-    
+        
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             passengers.remove(at: indexPath.row)
