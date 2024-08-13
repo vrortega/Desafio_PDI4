@@ -11,26 +11,11 @@ struct Flight {
     let origin: String
     let destination: String
     let capacity: Int
-    //let departureDate: Date
-    //let returnDate: Date?
+    let departureDate: String
+    let returnDate: String?
     let pilots: [Pilot]
     let coPilots: [CoPilot]
     let flightAttendants: [FlightAttendant]
     let passengers: [Passenger]
 }
 
-
-class FlightManager {
-    static let shared = FlightManager()
-    private(set) var flights: [Flight] = []
-    
-    private init() {}
-    
-    func addFlight(_ flight: Flight) {
-        flights.append(flight)
-    }
-    
-    func removeFlight(at index: Int) {
-        flights.remove(at: index)
-    }
-}
