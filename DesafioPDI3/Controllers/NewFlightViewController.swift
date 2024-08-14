@@ -308,12 +308,12 @@ class NewFlightViewController: UIViewController {
             oneWayStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             oneWayStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-            passengerView.topAnchor.constraint(equalTo: oneWayStackView.bottomAnchor, constant: 32),
+            passengerView.topAnchor.constraint(equalTo: oneWayStackView.bottomAnchor, constant: 20),
             passengerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             passengerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             passengerView.heightAnchor.constraint(equalToConstant: 70),
             
-            crewView.topAnchor.constraint(equalTo: passengerView.bottomAnchor, constant: 30),
+            crewView.topAnchor.constraint(equalTo: passengerView.bottomAnchor, constant: 15),
             crewView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             crewView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             crewView.heightAnchor.constraint(equalToConstant: 70),
@@ -340,8 +340,8 @@ class NewFlightViewController: UIViewController {
     }
     
     @objc private func oneWaySwitchChanged(_ sender: UISwitch) {
-        returnDateLabel.isHidden = sender.isOn
-        returnDatePicker.isHidden = sender.isOn
+        returnDatePicker.isUserInteractionEnabled = !sender.isOn
+        returnDatePicker.alpha = sender.isOn ? 0.5 : 1.0
     }
     
     @objc private func passengerViewTapped() {
