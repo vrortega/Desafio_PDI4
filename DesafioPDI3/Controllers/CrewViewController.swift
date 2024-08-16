@@ -8,9 +8,8 @@
 import UIKit
 
 protocol CrewViewControllerDelegate: AnyObject {
-    func didUpdateCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant])
+    func didAddCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant])
 }
-
 
 class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -54,7 +53,7 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let button = UIButton(type: .system)
         button.setTitle("Embarcar", for: .normal)
         button.tintColor = .white
-        button.backgroundColor = .systemGreen
+        button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(embarkButtonTapped), for: .touchUpInside)
@@ -92,6 +91,11 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         setupLayout()
         updateUI(for: roleSegmentedControl.selectedSegmentIndex)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateCrewTable()
     }
     
     private func setupLayout() {
@@ -161,9 +165,11 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         stepperValueChanged()
         
         updateUI(for: roleSegmentedControl.selectedSegmentIndex)
-        updateCrewTable()
         
-        delegate?.didUpdateCrew(pilots: pilots, coPilots: coPilots, flightAttendants: flightAttendants)
+        updateCrewTable()
+        crewTableView.reloadData()
+        
+        delegate?.didAddCrew(pilots: pilots, coPilots: coPilots, flightAttendants: flightAttendants)
     }
     
     private func updateCrewTable() {
@@ -172,9 +178,7 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         crewTableView.isHidden = !hasCrew
         crewTableView.reloadData()
     }
-    
-    // MARK: - UITableViewDataSource
-    
+        
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return pilots.count + coPilots.count + flightAttendants.count
     }

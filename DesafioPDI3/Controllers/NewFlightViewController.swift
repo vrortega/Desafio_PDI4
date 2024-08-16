@@ -9,6 +9,8 @@ import UIKit
 
 class NewFlightViewController: UIViewController {
     
+    weak var delegate: CrewViewControllerDelegate?
+    
     private let originTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Origem"
@@ -345,17 +347,18 @@ class NewFlightViewController: UIViewController {
     }
     
     @objc private func passengerViewTapped() {
-        let passengersVC = PassengersViewController()
-        passengersVC.passengers = passengers
-        passengersVC.delegate = self
-        navigationController?.pushViewController(passengersVC, animated: true)
-    }
+           let passengersVC = PassengersViewController()
+           passengersVC.passengers = passengers
+           passengersVC.delegate = self
+           navigationController?.pushViewController(passengersVC, animated: true)
+       }
     
     @objc private func crewViewTapped() {
         let crewVC = CrewViewController()
         crewVC.pilots = pilots
         crewVC.coPilots = coPilots
         crewVC.flightAttendants = flightAttendants
+        crewVC.delegate = self
         navigationController?.pushViewController(crewVC, animated: true)
     }
     
@@ -392,7 +395,7 @@ class NewFlightViewController: UIViewController {
 }
 
 extension NewFlightViewController: PassengersViewControllerDelegate {
-    func didUpdatePassengers(_ passengers: [Passenger]) {
+    func didAddPassengers(_ passengers: [Passenger]) {
         self.passengers = passengers
         updatePassengerLabel()
     }
@@ -401,7 +404,27 @@ extension NewFlightViewController: PassengersViewControllerDelegate {
         if passengers.isEmpty {
             passengerLabel.text = "Nenhum passageiro adicionado"
         } else {
-            passengerLabel.text = "\(passengers.count) passageiro(s) adicionados"
+            passengerLabel.text = "\(passengers.count) passageiro(s) adicionado(s)"
+        }
+    }
+}
+
+
+extension NewFlightViewController: CrewViewControllerDelegate {
+    func didAddCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant]) {
+        self.pilots = pilots
+        self.coPilots = coPilots
+        self.flightAttendants = flightAttendants
+        
+        updateCrewLabel()
+    }
+    
+    private func updateCrewLabel() {
+        let totalCrew = pilots.count + coPilots.count + flightAttendants.count
+        if totalCrew == 0 {
+            crewLabel.text = "Nenhum tripulante adicionado"
+        } else {
+            crewLabel.text = "\(totalCrew) tripulante(s) adicionado(s)"
         }
     }
 }

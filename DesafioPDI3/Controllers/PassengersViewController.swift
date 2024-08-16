@@ -8,7 +8,7 @@
 import UIKit
 
 protocol PassengersViewControllerDelegate: AnyObject {
-    func didUpdatePassengers(_ passengers: [Passenger])
+    func didAddPassengers(_ passengers: [Passenger])
 }
 
 class PassengersViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -71,6 +71,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         passengersTableView.register(UITableViewCell.self, forCellReuseIdentifier: "PassengerCell")
         
         setupLayout()
+        updateUI()
     }
     
     private func setupLayout() {
@@ -117,7 +118,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         ageTextField.text = ""
         updateUI()
         
-        delegate?.didUpdatePassengers(passengers)
+        delegate?.didAddPassengers(passengers)
         
     }
     
@@ -143,6 +144,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
             passengers.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
             updateUI()
+            delegate?.didAddPassengers(passengers)
         }
     }
 }
