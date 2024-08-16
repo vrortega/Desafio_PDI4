@@ -172,21 +172,34 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let flight = flights[indexPath.row]
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "yyyy-MM-dd" 
         
-        if let returnDateString = flight.returnDate, let returnDate = dateFormatter.date(from: returnDateString) {
-            let formattedDate = dateFormatter.string(from: returnDate)
-            cell.detailTextLabel?.text = "Volta: \(formattedDate) | \(flight.passengers.count) passageiro(s)"
-        } else {
-            cell.detailTextLabel?.text = "Data de retorno inválida | \(flight.passengers.count) passageiro(s)"
+        var departureDateString = "Data inválida"
+        var returnDateString: String? = nil
+        
+        if let departureDate = dateFormatter.date(from: flight.departureDate) {
+            dateFormatter.dateStyle = .medium
+            departureDateString = dateFormatter.string(from: departureDate)
         }
         
-        cell.textLabel?.text = "\(flight.origin) -> \(flight.destination)"
+        if let returnDateStr = flight.returnDate, let returnDate = dateFormatter.date(from: returnDateStr) {
+            returnDateString = dateFormatter.string(from: returnDate)
+        }
+        
+        var detailText: String
+        
+        if let returnDateString = returnDateString {
+            detailText = "Ida: \(departureDateString) - Volta: \(returnDateString) | \(flight.passengers.count) passageiro(s)"
+        } else {
+            detailText = "Ida: \(departureDateString) - Somente ida | \(flight.passengers.count) passageiro(s)"
+        }
+        
+        cell.textLabel?.text = "\(flight.origin) - \(flight.destination)"
+        cell.detailTextLabel?.text = detailText
         
         return cell
     }
 
-    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             flights.remove(at: indexPath.row)

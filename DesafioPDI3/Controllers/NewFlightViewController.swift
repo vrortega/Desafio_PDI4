@@ -363,26 +363,83 @@ class NewFlightViewController: UIViewController {
     }
     
     @objc private func addFlightButtonTapped() {
-         guard let origin = originTextField.text, !origin.isEmpty,
-               let destination = destinationTextField.text, !destination.isEmpty else {
-             let alert = UIAlertController(title: "Erro", message: "Por favor, preencha todos os campos.", preferredStyle: .alert)
-             alert.addAction(UIAlertAction(title: "OK", style: .default))
-             present(alert, animated: true)
-             return
-         }
-         
-         let dateFormatter = DateFormatter()
-         dateFormatter.dateFormat = "yyyy-MM-dd"
-         
-         let departureDate = dateFormatter.string(from: departureDatePicker.date)
-         let returnDate = dateFormatter.string(from: returnDatePicker.date)
-         
-         let capacity = Int(stepper.value)
-         let flight = Flight(origin: origin, destination: destination, capacity: capacity, departureDate: departureDate, returnDate: returnDate, pilots: [], coPilots: [], flightAttendants: [], passengers: [])
-         
-        onFlightAdded?(flight)
-        navigationController?.popViewController(animated: true)
-     }
+           guard validateCities(),
+                 validateCrew(),
+                 validateCapacity() else {
+               return
+           }
+           
+           let origin = originTextField.text!
+           let destination = destinationTextField.text!
+           
+           let dateFormatter = DateFormatter()
+           dateFormatter.dateFormat = "yyyy-MM-dd"
+           
+           let departureDate = dateFormatter.string(from: departureDatePicker.date)
+           let returnDate = oneWaySwitch.isOn ? nil : dateFormatter.string(from: returnDatePicker.date)
+           
+           let capacity = Int(stepper.value)
+           let flight = Flight(
+               origin: origin,
+               destination: destination,
+               capacity: capacity,
+               departureDate: departureDate,
+               returnDate: returnDate,
+               pilots: pilots,
+               coPilots: coPilots,
+               flightAttendants: flightAttendants,
+               passengers: passengers
+           )
+           
+           onFlightAdded?(flight)
+        print("\(flight.departureDate), \(flight.returnDate)")
+           navigationController?.popViewController(animated: true)
+       }
+       
+       private func validateCities() -> Bool {
+           guard let origin = originTextField.text, origin.count == 3 else {
+               showAlert(title: "Erro", message: "Por favor, preencha a cidade de origem com 3 caracteres.")
+               return false
+           }
+           
+           guard let destination = destinationTextField.text, destination.count == 3 else {
+               showAlert(title: "Erro", message: "Por favor, preencha a cidade de destino com 3 caracteres.")
+               return false
+           }
+           
+           return true
+       }
+       
+       private func validateCrew() -> Bool {
+           if pilots.count != 1 {
+               showAlert(title: "Erro", message: "É necessário ter exatamente 1 piloto.")
+               return false
+           }
+           
+           if coPilots.count != 1 {
+               showAlert(title: "Erro", message: "É necessário ter exatamente 1 co-piloto.")
+               return false
+           }
+           
+           if flightAttendants.count < 1 || flightAttendants.count > 3 {
+               showAlert(title: "Erro", message: "O voo deve ter entre 1 e 3 comissários.")
+               return false
+           }
+           
+           return true
+       }
+       
+       private func validateCapacity() -> Bool {
+           let totalPeople = pilots.count + coPilots.count + flightAttendants.count + passengers.count
+           let capacity = Int(stepper.value)
+           
+           if capacity < totalPeople {
+               showAlert(title: "Erro", message: "A capacidade do voo foi excedida.")
+               return false
+           }
+           
+           return true
+       }
     
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
