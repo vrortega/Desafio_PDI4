@@ -8,7 +8,15 @@
 import UIKit
 
 class FlightDetailsViewController: UIViewController {
-    var flight: Flight?
+    var flight: Flight? {
+        didSet {
+            guard let flight = flight else { return }
+            print(flight.passengers)
+            viewModel = FlightDetailsViewModel(flight: flight)
+        }
+    }
+    
+    private var viewModel: FlightDetailsViewModel?
 
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -82,21 +90,21 @@ class FlightDetailsViewController: UIViewController {
     }
 
     private func configureViews() {
-        guard let flight = flight else { return }
+        guard let viewModel = viewModel else { return }
 
         let originLabel = UILabel()
-        originLabel.text = flight.origin
-        originLabel.font = .systemFont(ofSize: 70, weight: .bold)
+        originLabel.text = viewModel.origin
+        originLabel.font = .systemFont(ofSize: 50, weight: .bold)
 
         let arrowImageView = UIImageView(image: UIImage(systemName: "arrow.left.arrow.right"))
         arrowImageView.contentMode = .scaleAspectFit
         arrowImageView.translatesAutoresizingMaskIntoConstraints = false
-        arrowImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        arrowImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        arrowImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        arrowImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
 
         let destinationLabel = UILabel()
-        destinationLabel.text = flight.destination
-        destinationLabel.font = .systemFont(ofSize: 70, weight: .bold)
+        destinationLabel.text = viewModel.destination
+        destinationLabel.font = .systemFont(ofSize: 50, weight: .bold)
 
         let originDestinationStackView = UIStackView(arrangedSubviews: [originLabel, arrowImageView, destinationLabel])
         originDestinationStackView.axis = .horizontal
@@ -104,28 +112,19 @@ class FlightDetailsViewController: UIViewController {
         originDestinationStackView.spacing = 4
         originDestinationStackView.distribution = .equalSpacing
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yy"
-
-        let departureDate = dateFormatter.date(from: flight.departureDate) ?? Date()
-        let formattedDepartureDate = dateFormatter.string(from: departureDate)
         let departureDateLabel = UILabel()
-        departureDateLabel.text = "Ida: \(formattedDepartureDate)"
+        departureDateLabel.text = viewModel.departureDateText
         departureDateLabel.font = .systemFont(ofSize: 14, weight: .regular)
 
-
-        let returnDateText = flight.returnDate != nil ? flight.returnDate : ""
-        let returnDate = dateFormatter.date(from: returnDateText ?? "") ?? Date()
-        let formattedReturnDate = dateFormatter.string(from: returnDate)
         let returnDateLabel = UILabel()
-        returnDateLabel.text = returnDateText != "" ? "Volta: \(formattedReturnDate)" : ""
+        returnDateLabel.text = viewModel.returnDateText
         returnDateLabel.font = .systemFont(ofSize: 14, weight: .regular)
 
         let datesStackView = UIStackView(arrangedSubviews: [departureDateLabel, returnDateLabel])
         datesStackView.axis = .vertical
         datesStackView.alignment = .center
         datesStackView.spacing = 8
-        
+
         flightInfoView.addSubview(datesStackView)
 
         let flightInfoStackView = UIStackView(arrangedSubviews: [originDestinationStackView, datesStackView])
@@ -142,8 +141,9 @@ class FlightDetailsViewController: UIViewController {
             flightInfoStackView.bottomAnchor.constraint(equalTo: flightInfoView.bottomAnchor, constant: -20)
         ])
 
+        // Passengers
         let passengersLabel = UILabel()
-        passengersLabel.text = "Passageiros | Capacidade: \(flight.capacity)"
+        passengersLabel.text = viewModel.passengersLabelText
         passengersLabel.font = .systemFont(ofSize: 18, weight: .bold)
 
         let passengersStackView = UIStackView(arrangedSubviews: [passengersLabel])
@@ -151,9 +151,10 @@ class FlightDetailsViewController: UIViewController {
         passengersStackView.spacing = 8
         passengersStackView.translatesAutoresizingMaskIntoConstraints = false
 
-        for passenger in flight.passengers {
+        for passengerName in viewModel.passengerNames {
+            print(passengerName)
             let passengerLabel = UILabel()
-            passengerLabel.text = passenger.name
+            passengerLabel.text = passengerName
             passengersStackView.addArrangedSubview(passengerLabel)
         }
 
@@ -166,6 +167,7 @@ class FlightDetailsViewController: UIViewController {
             passengersStackView.bottomAnchor.constraint(equalTo: passengersView.bottomAnchor, constant: -20)
         ])
 
+        // Crew
         let crewLabel = UILabel()
         crewLabel.text = "Tripulação"
         crewLabel.font = .systemFont(ofSize: 18, weight: .bold)
@@ -175,22 +177,10 @@ class FlightDetailsViewController: UIViewController {
         crewStackView.spacing = 8
         crewStackView.translatesAutoresizingMaskIntoConstraints = false
 
-        for pilot in flight.pilots {
-            let pilotLabel = UILabel()
-            pilotLabel.text = "Piloto: \(pilot.name)"
-            crewStackView.addArrangedSubview(pilotLabel)
-        }
-
-        for coPilot in flight.coPilots {
-            let coPilotLabel = UILabel()
-            coPilotLabel.text = "Co-Piloto: \(coPilot.name)"
-            crewStackView.addArrangedSubview(coPilotLabel)
-        }
-
-        for attendant in flight.flightAttendants {
-            let attendantLabel = UILabel()
-            attendantLabel.text = "Comissário: \(attendant.name)"
-            crewStackView.addArrangedSubview(attendantLabel)
+        for crewDetail in viewModel.crewInfo {
+            let crewMemberLabel = UILabel()
+            crewMemberLabel.text = crewDetail
+            crewStackView.addArrangedSubview(crewMemberLabel)
         }
 
         crewView.addSubview(crewStackView)

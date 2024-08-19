@@ -10,6 +10,14 @@ import UIKit
 class NewFlightViewController: UIViewController {
     
     weak var delegate: CrewViewControllerDelegate?
+    var viewModel: NewFlightViewModel?
+    
+    var onFlightAdded: ((Flight) -> Void)?
+    
+    var passengers: [Passenger] = []
+    var pilots: [Pilot] = []
+    var coPilots: [CoPilot] = []
+    var flightAttendants: [FlightAttendant] = []
     
     private let originTextField: UITextField = {
         let textField = UITextField()
@@ -39,29 +47,7 @@ class NewFlightViewController: UIViewController {
         stepper.minimumValue = 1
         stepper.value = 1
         stepper.translatesAutoresizingMaskIntoConstraints = false
-        stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
         return stepper
-    }()
-    
-    private let peopleIcon: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "person.fill"))
-        imageView.tintColor = .black
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-    
-    private let originIcon: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "airplane.departure"))
-        imageView.tintColor = .black
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-    
-    private let destinationIcon: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "airplane.arrival"))
-        imageView.tintColor = .black
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
     }()
     
     private let departureDateLabel: UILabel = {
@@ -107,25 +93,24 @@ class NewFlightViewController: UIViewController {
     }()
     
     private let passengerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(white: 0.9, alpha: 1)
-        view.layer.cornerRadius = 8
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private let crewView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(white: 0.9, alpha: 1)
-        view.layer.cornerRadius = 8
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+          let view = UIView()
+          view.backgroundColor = UIColor(white: 0.9, alpha: 1)
+          view.layer.cornerRadius = 8
+          view.translatesAutoresizingMaskIntoConstraints = false
+          return view
+      }()
+      
+      private let crewView: UIView = {
+          let view = UIView()
+          view.backgroundColor = UIColor(white: 0.9, alpha: 1)
+          view.layer.cornerRadius = 8
+          view.translatesAutoresizingMaskIntoConstraints = false
+          return view
+      }()
     
     private let passengerLabel: UILabel = {
         let label = UILabel()
         label.text = "Nenhum passageiro adicionado"
-        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -133,16 +118,8 @@ class NewFlightViewController: UIViewController {
     private let crewLabel: UILabel = {
         let label = UILabel()
         label.text = "Nenhum tripulante adicionado"
-        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
-    }()
-    
-    private let rightArrowIcon: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
-        imageView.tintColor = .black
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
     }()
     
     private let takeoffButton: UIButton = {
@@ -152,29 +129,24 @@ class NewFlightViewController: UIViewController {
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(addFlightButtonTapped), for: .touchUpInside)
         return button
     }()
     
-    var passengers: [Passenger] = []
-    var pilots: [Pilot] = []
-    var coPilots: [CoPilot] = []
-    var flightAttendants: [FlightAttendant] = []
-    
-    var onFlightAdded: ((Flight) -> Void)?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = .white
         title = "Novo Voo"
         
-        setupGestureRecognizers()
         setupLayout()
-        
-        oneWaySwitch.addTarget(self, action: #selector(oneWaySwitchChanged), for: .valueChanged)
+        setupGestureRecognizers()
+        setupTargets()
+        bindViewModel()
     }
     
+    private func setupTargets() {
+        stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
+        takeoffButton.addTarget(self, action: #selector(addFlightButtonTapped), for: .touchUpInside)
+    }
     
     private func setupGestureRecognizers() {
         let passengerTapGesture = UITapGestureRecognizer(target: self, action: #selector(passengerViewTapped))
@@ -184,83 +156,115 @@ class NewFlightViewController: UIViewController {
         crewView.addGestureRecognizer(crewTapGesture)
     }
     
+    
+    private func bindViewModel() {
+        guard let viewModel = viewModel else {
+            print("viewModel é nil no bindViewModel")
+            return
+        }
+
+        viewModel.updateCapacityLabel = { [weak self] text in
+            self?.capacityLabel.text = text
+        }
+        
+        viewModel.updateOneWayState = { [weak self] isOneWay in
+            self?.returnDatePicker.isUserInteractionEnabled = !isOneWay
+            self?.returnDatePicker.alpha = isOneWay ? 0.5 : 1.0
+        }
+        
+        viewModel.updatePassengerLabel = { [weak self] text in
+            self?.passengerLabel.text = text
+        }
+        
+        viewModel.updateCrewLabel = { [weak self] text in
+            self?.crewLabel.text = text
+        }
+    }
+    
     private func setupLayout() {
         let iconSize: CGFloat = 30.0
         let iconSize2: CGFloat = 25.00
-        
+
         let departureCalendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
         departureCalendarIcon.tintColor = .black
         departureCalendarIcon.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let returnCalendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
         returnCalendarIcon.tintColor = .black
         returnCalendarIcon.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let passengerIcon = UIImageView(image: UIImage(systemName: "person.fill"))
         passengerIcon.tintColor = .black
         passengerIcon.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let capacityIcon = UIImageView(image: UIImage(systemName: "person.3.fill"))
         capacityIcon.tintColor = .black
         capacityIcon.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let crewIcon = UIImageView(image: UIImage(systemName: "person.fill"))
         crewIcon.tintColor = .black
         crewIcon.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let rightArrowPassenger = UIImageView(image: UIImage(systemName: "arrow.forward.circle.fill"))
         rightArrowPassenger.tintColor = .black
         rightArrowPassenger.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let rightArrowCrew = UIImageView(image: UIImage(systemName: "arrow.forward.circle.fill"))
         rightArrowCrew.tintColor = .black
         rightArrowCrew.translatesAutoresizingMaskIntoConstraints = false
-        
+
+        let originIcon = UIImageView(image: UIImage(systemName: "airplane.departure"))
+        originIcon.tintColor = .black
+        originIcon.translatesAutoresizingMaskIntoConstraints = false
+
+        let destinationIcon = UIImageView(image: UIImage(systemName: "airplane.arrival"))
+        destinationIcon.tintColor = .black
+        destinationIcon.translatesAutoresizingMaskIntoConstraints = false
+
         let originStackView = UIStackView(arrangedSubviews: [originIcon, originTextField])
         originStackView.axis = .horizontal
         originStackView.spacing = 8
         originStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let destinationStackView = UIStackView(arrangedSubviews: [destinationIcon, destinationTextField])
         destinationStackView.axis = .horizontal
         destinationStackView.spacing = 8
         destinationStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let capacityStackView = UIStackView(arrangedSubviews: [capacityIcon, capacityLabel, stepper])
         capacityStackView.axis = .horizontal
         capacityStackView.spacing = 8
         capacityStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let departureDateStackView = UIStackView(arrangedSubviews: [departureCalendarIcon, departureDateLabel, departureDatePicker])
         departureDateStackView.axis = .horizontal
         departureDateStackView.spacing = 8
         departureDateStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let returnDateStackView = UIStackView(arrangedSubviews: [returnCalendarIcon, returnDateLabel, returnDatePicker])
         returnDateStackView.axis = .horizontal
         returnDateStackView.spacing = 8
         returnDateStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let oneWayStackView = UIStackView(arrangedSubviews: [oneWayLabel, oneWaySwitch])
         oneWayStackView.axis = .horizontal
         oneWayStackView.spacing = 8
         oneWayStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let passengerStackView = UIStackView(arrangedSubviews: [passengerIcon, passengerLabel, rightArrowPassenger])
         passengerStackView.axis = .horizontal
         passengerStackView.spacing = 10
         passengerStackView.alignment = .center
         passengerStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let crewStackView = UIStackView(arrangedSubviews: [crewIcon, crewLabel, rightArrowCrew])
         crewStackView.axis = .horizontal
         crewStackView.spacing = 8
         crewStackView.alignment = .center
         crewStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         passengerView.addSubview(passengerStackView)
         crewView.addSubview(crewStackView)
-        
         view.addSubview(originStackView)
         view.addSubview(destinationStackView)
         view.addSubview(capacityStackView)
@@ -270,7 +274,7 @@ class NewFlightViewController: UIViewController {
         view.addSubview(passengerView)
         view.addSubview(crewView)
         view.addSubview(takeoffButton)
-        
+
         NSLayoutConstraint.activate([
             originIcon.widthAnchor.constraint(equalToConstant: iconSize),
             originIcon.heightAnchor.constraint(equalToConstant: iconSize),
@@ -339,122 +343,77 @@ class NewFlightViewController: UIViewController {
             takeoffButton.topAnchor.constraint(equalTo: crewView.bottomAnchor, constant: 60),
             takeoffButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             takeoffButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            takeoffButton.heightAnchor.constraint(equalToConstant: 50)
-            
+            takeoffButton.heightAnchor.constraint(equalToConstant: 50),
         ])
     }
     
-    @objc private func stepperValueChanged(_ sender: UIStepper) {
-        let capacity = Int(sender.value)
-        capacityLabel.text = "Capacidade de \(capacity) pessoa(s)"
-    }
-    
-    @objc private func oneWaySwitchChanged(_ sender: UISwitch) {
-        returnDatePicker.isUserInteractionEnabled = !sender.isOn
-        returnDatePicker.alpha = sender.isOn ? 0.5 : 1.0
-    }
-    
     @objc private func passengerViewTapped() {
-        let passengersVC = PassengersViewController()
-        passengersVC.passengers = passengers
-        passengersVC.delegate = self
-        navigationController?.pushViewController(passengersVC, animated: true)
+        let passengerVC = PassengersViewController()
+        passengerVC.delegate = self
+        passengerVC.passengers = self.passengers
+        navigationController?.pushViewController(passengerVC, animated: true)
     }
     
     @objc private func crewViewTapped() {
         let crewVC = CrewViewController()
-        crewVC.pilots = pilots
-        crewVC.coPilots = coPilots
-        crewVC.flightAttendants = flightAttendants
         crewVC.delegate = self
+        crewVC.pilots = self.pilots
+        crewVC.coPilots = self.coPilots
+        crewVC.flightAttendants = self.flightAttendants
         navigationController?.pushViewController(crewVC, animated: true)
     }
     
+    @objc private func stepperValueChanged(_ sender: UIStepper) {
+        viewModel?.capacity = Int(sender.value)
+    }
+    
     @objc private func addFlightButtonTapped() {
-        guard validateCities(),
-              validateCrew(),
-              validateCapacity() else {
+        guard let viewModel = viewModel else { return }
+        
+        viewModel.origin = originTextField.text ?? ""
+        viewModel.destination = destinationTextField.text ?? ""
+        viewModel.departureDate = departureDatePicker.date
+        viewModel.returnDate = returnDatePicker.date
+        viewModel.isOneWay = oneWaySwitch.isOn
+        
+        if !viewModel.validateCities() {
+            showAlert(title: "Erro", message: "A origem e o destino devem conter 3 caracteres.")
             return
         }
         
-        let origin = originTextField.text!
-        let destination = destinationTextField.text!
+        if !viewModel.validateCrew() {
+            showAlert(title: "Erro", message: "A tripulação deve conter 1 piloto, 1 copiloto e entre 1 e 3 comissários.")
+            return
+        }
+        
+        if !viewModel.validateCapacity() {
+            showAlert(title: "Erro", message: "A capacidade deve ser maior ou igual ao total de pessoas a bordo.")
+            return
+        }
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
-        let departureDate = dateFormatter.string(from: departureDatePicker.date)
-        
-        let returnDate = oneWaySwitch.isOn ? nil : dateFormatter.string(from: returnDatePicker.date)
+        let departureDateStr = dateFormatter.string(from: viewModel.departureDate)
+        let returnDateStr = viewModel.isOneWay ? nil : dateFormatter.string(from: viewModel.returnDate ?? Date())
         
         let flight = Flight(
-            origin: origin,
-            destination: destination,
-            capacity: Int(stepper.value),
-            departureDate: departureDate,
-            returnDate: returnDate,
-            pilots: pilots,
-            coPilots: coPilots,
-            flightAttendants: flightAttendants,
-            passengers: passengers
+            origin: viewModel.origin, destination: viewModel.destination, capacity: viewModel.capacity, departureDate: departureDateStr, returnDate: returnDateStr, pilots: viewModel.pilots, coPilots: viewModel.coPilots, flightAttendants: viewModel.flightAttendants, passengers: viewModel.passengers
         )
         
         onFlightAdded?(flight)
-        print("\(flight.departureDate), \(String(describing: flight.returnDate))")
-        navigationController?.popViewController(animated: true)
+        navigateToFlightsViewController()
     }
     
-    private func validateCities() -> Bool {
-        guard let origin = originTextField.text, origin.count == 3 else {
-            showAlert(title: "Erro", message: "Por favor, preencha a cidade de origem com 3 caracteres.")
-            return false
+    private func navigateToFlightsViewController() {
+        if let flightsVC = navigationController?.viewControllers.first(where: { $0 is FlightsViewController}) {
+            navigationController?.popToViewController(flightsVC, animated: true)
         }
-        
-        guard let destination = destinationTextField.text, destination.count == 3 else {
-            showAlert(title: "Erro", message: "Por favor, preencha a cidade de destino com 3 caracteres.")
-            return false
-        }
-        
-        return true
     }
-    
-    private func validateCrew() -> Bool {
-        if pilots.count != 1 {
-            showAlert(title: "Erro", message: "É necessário ter exatamente 1 piloto.")
-            return false
-        }
-        
-        if coPilots.count != 1 {
-            showAlert(title: "Erro", message: "É necessário ter exatamente 1 co-piloto.")
-            return false
-        }
-        
-        if flightAttendants.count < 1 || flightAttendants.count > 3 {
-            showAlert(title: "Erro", message: "O voo deve ter entre 1 e 3 comissários.")
-            return false
-        }
-        
-        return true
-    }
-    
-    private func validateCapacity() -> Bool {
-        let totalPeople = pilots.count + coPilots.count + flightAttendants.count + passengers.count
-        let capacity = Int(stepper.value)
-        
-        if capacity < totalPeople {
-            showAlert(title: "Erro", message: "A capacidade do voo foi excedida.")
-            return false
-        }
-        
-        return true
-    }
-    
-    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+
+    private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "OK", style: .default) { _ in
-            completion?()
-        }
-        alert.addAction(okAction)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
 }
@@ -462,6 +421,7 @@ class NewFlightViewController: UIViewController {
 extension NewFlightViewController: PassengersViewControllerDelegate {
     func didAddPassengers(_ passengers: [Passenger]) {
         self.passengers = passengers
+        viewModel?.passengers = passengers
         updatePassengerLabel()
     }
     
@@ -474,13 +434,15 @@ extension NewFlightViewController: PassengersViewControllerDelegate {
     }
 }
 
-
 extension NewFlightViewController: CrewViewControllerDelegate {
     func didAddCrew(pilots: [Pilot], coPilots: [CoPilot], flightAttendants: [FlightAttendant]) {
         self.pilots = pilots
         self.coPilots = coPilots
         self.flightAttendants = flightAttendants
         
+        viewModel?.pilots = pilots
+        viewModel?.coPilots = coPilots
+        viewModel?.flightAttendants = flightAttendants
         updateCrewLabel()
     }
     

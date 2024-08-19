@@ -10,16 +10,15 @@ import UIKit
 import CoreLocation
 
 class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
-    
+
     private let tableView = UITableView()
     private let weatherView = UIView()
     private let locationLabel = UILabel()
     private let temperatureLabel = UILabel()
     private let windLabel = UILabel()
     private let humidityLabel = UILabel()
-    
     private let locationManager = CLLocationManager()
-    
+
     private let noFlightsLabel: UILabel = {
         let label = UILabel()
         label.text = "Nenhum voo adicionado"
@@ -27,40 +26,58 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    private var flights: [Flight] = []
-    
+
+    private let viewModel = FlightsViewModel()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
         title = "Voos"
         
-        setupNavigationBar()
-        setupWeatherView()
-        setupTableView()
-        updateNoFlightsLabel()
+        setupViews()
+        configureViews()
+        
+        setupViewModelBindings() 
         
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
-        print("FlightsViewController - viewDidLoad: \(flights.count) voos")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "flightCell")
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
         updateNoFlightsLabel()
-        
-        print("FlightsViewController - viewWillAppear: \(flights.count) voos")
-        
     }
-    
+
+    private func setupViews() {
+        setupNavigationBar()
+        setupWeatherView()
+        updateNoFlightsLabel()
+    }
+
+    private func configureViews() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.isHidden = true
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: weatherView.bottomAnchor, constant: 10),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+
     private func setupNavigationBar() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addFlightTapped))
     }
-    
+
     private func setupWeatherView() {
         weatherView.backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0)
         weatherView.layer.cornerRadius = 10
@@ -71,29 +88,17 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let temperatureIcon = UIImageView(image: UIImage(systemName: "thermometer"))
         temperatureIcon.translatesAutoresizingMaskIntoConstraints = false
         temperatureIcon.contentMode = .scaleAspectFit
-        let temperatureStackView = UIStackView(arrangedSubviews: [temperatureIcon, temperatureLabel])
-        temperatureStackView.axis = .vertical
-        temperatureStackView.alignment = .center
-        temperatureStackView.spacing = 4
-        temperatureStackView.translatesAutoresizingMaskIntoConstraints = false
+        let temperatureStackView = createStackView(with: temperatureIcon, label: temperatureLabel)
         
         let windIcon = UIImageView(image: UIImage(systemName: "wind"))
         windIcon.translatesAutoresizingMaskIntoConstraints = false
         windIcon.contentMode = .scaleAspectFit
-        let windStackView = UIStackView(arrangedSubviews: [windIcon, windLabel])
-        windStackView.axis = .vertical
-        windStackView.alignment = .center
-        windStackView.spacing = 4
-        windStackView.translatesAutoresizingMaskIntoConstraints = false
+        let windStackView = createStackView(with: windIcon, label: windLabel)
         
         let humidityIcon = UIImageView(image: UIImage(systemName: "drop"))
         humidityIcon.translatesAutoresizingMaskIntoConstraints = false
         humidityIcon.contentMode = .scaleAspectFit
-        let humidityStackView = UIStackView(arrangedSubviews: [humidityIcon, humidityLabel])
-        humidityStackView.axis = .vertical
-        humidityStackView.alignment = .center
-        humidityStackView.spacing = 4
-        humidityStackView.translatesAutoresizingMaskIntoConstraints = false
+        let humidityStackView = createStackView(with: humidityIcon, label: humidityLabel)
         
         let infoStackView = UIStackView(arrangedSubviews: [temperatureStackView, windStackView, humidityStackView])
         infoStackView.axis = .horizontal
@@ -119,27 +124,21 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
             infoStackView.trailingAnchor.constraint(equalTo: weatherView.trailingAnchor, constant: -16),
         ])
     }
-    
-    private func setupTableView() {
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.isHidden = true
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-        
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: weatherView.bottomAnchor, constant: 10),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
+
+    private func createStackView(with icon: UIImageView, label: UILabel) -> UIStackView {
+        let stackView = UIStackView(arrangedSubviews: [icon, label])
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 4
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }
-    
+
     private func updateNoFlightsLabel() {
-        noFlightsLabel.isHidden = !flights.isEmpty
-        tableView.isHidden = flights.isEmpty
-        
-        if flights.isEmpty {
+        noFlightsLabel.isHidden = !viewModel.flights.isEmpty
+        tableView.isHidden = viewModel.flights.isEmpty
+
+        if viewModel.flights.isEmpty {
             view.addSubview(noFlightsLabel)
             NSLayoutConstraint.activate([
                 noFlightsLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -149,106 +148,118 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
             noFlightsLabel.removeFromSuperview()
         }
     }
-    
+
     @objc private func addFlightTapped() {
         let newFlightVC = NewFlightViewController()
-        newFlightVC.onFlightAdded = { [weak self] flight in
-            self?.flights.append(flight)
-            self?.tableView.reloadData()
-            self?.updateNoFlightsLabel()
-            
-        }
-        
+        newFlightVC.viewModel = NewFlightViewModel()
+        configureOnFlightAddedCallback(for: newFlightVC)
         navigationController?.pushViewController(newFlightVC, animated: true)
     }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return flights.count
+
+    private func configureOnFlightAddedCallback(for newFlightVC: NewFlightViewController) {
+        newFlightVC.onFlightAdded = { [weak self] flight in
+            self?.viewModel.addFlight(flight)
+            self?.viewModel.updateFlightList?()
+        }
     }
-    
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.flights.count
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "flightCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "flightCell")
-        
-        let flight = flights[indexPath.row]
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        var departureDateString = "Data inválida"
-        if let departureDate = dateFormatter.date(from: flight.departureDate) {
-            dateFormatter.dateStyle = .medium
-            departureDateString = dateFormatter.string(from: departureDate)
-        }
-                var returnDateString: String? = nil
-        if let returnDateStr = flight.returnDate, let returnDate = dateFormatter.date(from: returnDateStr) {
-            returnDateString = dateFormatter.string(from: returnDate)
-        }
-        
-        var detailText: String
-        if let returnDateString = returnDateString {
-            detailText = "Ida: \(departureDateString) - Volta: \(returnDateString) | \(flight.passengers.count) passageiro(s)"
-        } else {
-            detailText = "Ida: \(departureDateString) - Somente ida | \(flight.passengers.count) passageiro(s)"
-        }
-        
+        return createFlightCell(for: indexPath)
+    }
+
+    private func createFlightCell(for indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "flightCell", for: indexPath)
+        let flight = viewModel.flights[indexPath.row]
         cell.textLabel?.text = "\(flight.origin) - \(flight.destination)"
-        cell.detailTextLabel?.text = detailText
-        
+        cell.detailTextLabel?.text = flightDetailText(for: flight)
         return cell
+    }
+
+    private func flightDetailText(for flight: Flight) -> String {
+        let parseFormatter = DateFormatter()
+        parseFormatter.dateFormat = "yyyy-MM-dd"
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
+
+        var departureDateString = "Data inválida"
+        if let departureDate = parseFormatter.date(from: flight.departureDate) {
+            departureDateString = displayFormatter.string(from: departureDate)
+        }
+
+        var returnDateString: String?
+        if let returnDateStr = flight.returnDate, !returnDateStr.isEmpty, let returnDate = parseFormatter.date(from: returnDateStr) {
+            returnDateString = displayFormatter.string(from: returnDate)
+        }
+
+        if let returnDateString = returnDateString {
+            return "Ida: \(departureDateString) - Volta: \(returnDateString) | \(flight.passengers.count) passageiro(s)"
+        } else {
+            return "Ida: \(departureDateString) - Somente ida | \(flight.passengers.count) passageiro(s)"
+        }
     }
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            flights.remove(at: indexPath.row)
-            
-            tableView.beginUpdates()
-            tableView.deleteRows(at: [indexPath], with: .automatic)
-            tableView.endUpdates()
-            
-            updateNoFlightsLabel()
+            viewModel.removeFlight(at: indexPath.row)
         }
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedFlight = flights[indexPath.row]
+        let selectedFlight = viewModel.flights[indexPath.row]
         let flightDetailsVC = FlightDetailsViewController()
         flightDetailsVC.flight = selectedFlight
         
         navigationController?.pushViewController(flightDetailsVC, animated: true)
     }
-    
-    // MARK: - CLLocationManagerDelegate
-    
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
+        
         Task {
-            await fetchWeather(for: location.coordinate)
+            await viewModel.fetchWeather(for: location.coordinate)
+            
+            DispatchQueue.main.async {
+                self.updateWeatherView()
+            }
         }
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to get location: \(error)")
+        weatherView.isHidden = true
     }
     
-    private func fetchWeather(for coordinate: CLLocationCoordinate2D) async {
-        let apiKey = "ce0b023afe564606bb6232253243007"
-        let urlString = "https://api.weatherapi.com/v1/current.json?key=\(apiKey)&q=\(coordinate.latitude),\(coordinate.longitude)"
-        
-        guard let url = URL(string: urlString) else { return }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let weatherResponse = try JSONDecoder().decode(WeatherResponse.self, from: data)
-            updateWeatherView(with: weatherResponse)
-        } catch {
-            print("Failed to fetch weather data: \(error)")
+    private func setupViewModelBindings() {
+        viewModel.updateFlightList = { [weak self] in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+                self?.updateNoFlightsLabel()
+            }
+        }
+
+        viewModel.updateWeatherView = { [weak self] in
+            DispatchQueue.main.async {
+                self?.updateWeatherView()
+            }
+        }
+
+        viewModel.updateNoFlightsLabelVisibility = { [weak self] isVisible in
+            DispatchQueue.main.async {
+                self?.noFlightsLabel.isHidden = !isVisible
+                self?.tableView.isHidden = !isVisible
+            }
         }
     }
     
-    private func updateWeatherView(with weatherResponse: WeatherResponse) {
-        locationLabel.text = "\(weatherResponse.location.name), \(weatherResponse.location.region)"
-        temperatureLabel.text = "\(weatherResponse.current.temp_c)°C"
-        windLabel.text = "\(weatherResponse.current.wind_kph) kph"
-        humidityLabel.text = "\(weatherResponse.current.humidity)%"
+    private func updateWeatherView() {
+        locationLabel.text = viewModel.location
+        temperatureLabel.text = viewModel.temperature
+        windLabel.text = viewModel.windSpeed
+        humidityLabel.text = viewModel.humidity
     }
 }

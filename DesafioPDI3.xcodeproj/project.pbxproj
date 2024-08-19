@@ -20,8 +20,13 @@
 		4E449CCE2C4E8CDB00F9AB9A /* Pilot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CCD2C4E8CDB00F9AB9A /* Pilot.swift */; };
 		4E449CD02C4E8E8E00F9AB9A /* FlightAttendant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E449CCF2C4E8E8E00F9AB9A /* FlightAttendant.swift */; };
 		4E61623B2C59AC99001F2967 /* WeatherResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E61623A2C59AC99001F2967 /* WeatherResponse.swift */; };
+		4E719DDF2CC13B4200B99DDC /* FlightDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E719DDE2CC13B3A00B99DDC /* FlightDetailsViewModel.swift */; };
 		4E8513642C63F1D2002CA78E /* FlightDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8513632C63F1D2002CA78E /* FlightDetailsViewController.swift */; };
 		4EB73D452C4FE6C900F5024C /* Flight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB73D442C4FE6C900F5024C /* Flight.swift */; };
+		4EC608172CBD4F80000F7CC6 /* PassengersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC608162CBD4F73000F7CC6 /* PassengersViewModel.swift */; };
+		4EC608192CBEA65A000F7CC6 /* CrewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC608182CBEA64D000F7CC6 /* CrewViewModel.swift */; };
+		4EC6081E2CBFEA56000F7CC6 /* NewFlightViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC6081D2CBFEA4F000F7CC6 /* NewFlightViewModel.swift */; };
+		4EC608202CBFF0AD000F7CC6 /* FlightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC6081F2CBFF0A5000F7CC6 /* FlightsViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,8 +45,13 @@
 		4E449CCD2C4E8CDB00F9AB9A /* Pilot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pilot.swift; sourceTree = "<group>"; };
 		4E449CCF2C4E8E8E00F9AB9A /* FlightAttendant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightAttendant.swift; sourceTree = "<group>"; };
 		4E61623A2C59AC99001F2967 /* WeatherResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherResponse.swift; sourceTree = "<group>"; };
+		4E719DDE2CC13B3A00B99DDC /* FlightDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailsViewModel.swift; sourceTree = "<group>"; };
 		4E8513632C63F1D2002CA78E /* FlightDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailsViewController.swift; sourceTree = "<group>"; };
 		4EB73D442C4FE6C900F5024C /* Flight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flight.swift; sourceTree = "<group>"; };
+		4EC608162CBD4F73000F7CC6 /* PassengersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassengersViewModel.swift; sourceTree = "<group>"; };
+		4EC608182CBEA64D000F7CC6 /* CrewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrewViewModel.swift; sourceTree = "<group>"; };
+		4EC6081D2CBFEA4F000F7CC6 /* NewFlightViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFlightViewModel.swift; sourceTree = "<group>"; };
+		4EC6081F2CBFF0A5000F7CC6 /* FlightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +86,7 @@
 			children = (
 				4E449CAD2C481E0E00F9AB9A /* AppDelegate.swift */,
 				4E449CAF2C481E0E00F9AB9A /* SceneDelegate.swift */,
+				4EC608152CBD4F3F000F7CC6 /* ViewModel */,
 				4E449CCC2C4993BA00F9AB9A /* Models */,
 				4E449CC72C498B1300F9AB9A /* Controllers */,
 				4E449CB32C481E0E00F9AB9A /* Main.storyboard */,
@@ -108,6 +119,18 @@
 				4E61623A2C59AC99001F2967 /* WeatherResponse.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		4EC608152CBD4F3F000F7CC6 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				4E719DDE2CC13B3A00B99DDC /* FlightDetailsViewModel.swift */,
+				4EC6081F2CBFF0A5000F7CC6 /* FlightsViewModel.swift */,
+				4EC6081D2CBFEA4F000F7CC6 /* NewFlightViewModel.swift */,
+				4EC608182CBEA64D000F7CC6 /* CrewViewModel.swift */,
+				4EC608162CBD4F73000F7CC6 /* PassengersViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -181,10 +204,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EC608172CBD4F80000F7CC6 /* PassengersViewModel.swift in Sources */,
 				4E61623B2C59AC99001F2967 /* WeatherResponse.swift in Sources */,
 				4E449CC62C498A9D00F9AB9A /* PassengersViewController.swift in Sources */,
 				4E449CCB2C4993B100F9AB9A /* Passenger.swift in Sources */,
+				4E719DDF2CC13B4200B99DDC /* FlightDetailsViewModel.swift in Sources */,
 				4E449CC92C498B3900F9AB9A /* CrewViewController.swift in Sources */,
+				4EC6081E2CBFEA56000F7CC6 /* NewFlightViewModel.swift in Sources */,
 				4EB73D452C4FE6C900F5024C /* Flight.swift in Sources */,
 				4E8513642C63F1D2002CA78E /* FlightDetailsViewController.swift in Sources */,
 				4E449CD02C4E8E8E00F9AB9A /* FlightAttendant.swift in Sources */,
@@ -193,6 +219,8 @@
 				4E449CC42C481E9F00F9AB9A /* NewFlightViewController.swift in Sources */,
 				4E449CCE2C4E8CDB00F9AB9A /* Pilot.swift in Sources */,
 				4E449CB02C481E0E00F9AB9A /* SceneDelegate.swift in Sources */,
+				4EC608202CBFF0AD000F7CC6 /* FlightsViewModel.swift in Sources */,
+				4EC608192CBEA65A000F7CC6 /* CrewViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
