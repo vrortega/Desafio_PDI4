@@ -75,25 +75,38 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
     }
     
     private func setupLayout() {
-        let stackView = UIStackView(arrangedSubviews: [nameTextField, ageTextField, embarkButton, noPassengersLabel, passengersTableView])
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(stackView)
+        view.addSubview(nameTextField)
+        view.addSubview(ageTextField)
+        view.addSubview(embarkButton)
+        view.addSubview(noPassengersLabel)
+        view.addSubview(passengersTableView)
         
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
+            nameTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             nameTextField.heightAnchor.constraint(equalToConstant: 35),
+            
+            ageTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 16),
+            ageTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+            ageTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
             ageTextField.heightAnchor.constraint(equalToConstant: 35),
+            
+            embarkButton.topAnchor.constraint(equalTo: ageTextField.bottomAnchor, constant: 16),
+            embarkButton.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+            embarkButton.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
             embarkButton.heightAnchor.constraint(equalToConstant: 44),
-            passengersTableView.heightAnchor.constraint(equalToConstant: 200)
+            
+            noPassengersLabel.topAnchor.constraint(equalTo: embarkButton.bottomAnchor, constant: 16),
+            noPassengersLabel.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+            noPassengersLabel.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
+            
+            passengersTableView.topAnchor.constraint(equalTo: embarkButton.bottomAnchor, constant: 15),
+            passengersTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0),
+            passengersTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0),
+            passengersTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0)
         ])
     }
-    
     @objc private func embarkButtonTapped() {
         guard let name = nameTextField.text, !name.isEmpty,
               let ageText = ageTextField.text, !ageText.isEmpty,

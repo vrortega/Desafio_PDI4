@@ -102,6 +102,7 @@ class NewFlightViewController: UIViewController {
     private let oneWaySwitch: UISwitch = {
         let oneWaySwitch = UISwitch()
         oneWaySwitch.translatesAutoresizingMaskIntoConstraints = false
+        oneWaySwitch.onTintColor = .systemBlue
         return oneWaySwitch
     }()
     
@@ -160,7 +161,7 @@ class NewFlightViewController: UIViewController {
     var coPilots: [CoPilot] = []
     var flightAttendants: [FlightAttendant] = []
     
-  var onFlightAdded: ((Flight) -> Void)?
+    var onFlightAdded: ((Flight) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -185,6 +186,7 @@ class NewFlightViewController: UIViewController {
     
     private func setupLayout() {
         let iconSize: CGFloat = 30.0
+        let iconSize2: CGFloat = 25.00
         
         let departureCalendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
         departureCalendarIcon.tintColor = .black
@@ -198,15 +200,19 @@ class NewFlightViewController: UIViewController {
         passengerIcon.tintColor = .black
         passengerIcon.translatesAutoresizingMaskIntoConstraints = false
         
+        let capacityIcon = UIImageView(image: UIImage(systemName: "person.3.fill"))
+        capacityIcon.tintColor = .black
+        capacityIcon.translatesAutoresizingMaskIntoConstraints = false
+        
         let crewIcon = UIImageView(image: UIImage(systemName: "person.fill"))
         crewIcon.tintColor = .black
         crewIcon.translatesAutoresizingMaskIntoConstraints = false
         
-        let rightArrowPassenger = UIImageView(image: UIImage(systemName: "chevron.right"))
+        let rightArrowPassenger = UIImageView(image: UIImage(systemName: "arrow.forward.circle.fill"))
         rightArrowPassenger.tintColor = .black
         rightArrowPassenger.translatesAutoresizingMaskIntoConstraints = false
         
-        let rightArrowCrew = UIImageView(image: UIImage(systemName: "chevron.right"))
+        let rightArrowCrew = UIImageView(image: UIImage(systemName: "arrow.forward.circle.fill"))
         rightArrowCrew.tintColor = .black
         rightArrowCrew.translatesAutoresizingMaskIntoConstraints = false
         
@@ -220,7 +226,7 @@ class NewFlightViewController: UIViewController {
         destinationStackView.spacing = 8
         destinationStackView.translatesAutoresizingMaskIntoConstraints = false
         
-        let capacityStackView = UIStackView(arrangedSubviews: [passengerIcon, capacityLabel, stepper])
+        let capacityStackView = UIStackView(arrangedSubviews: [capacityIcon, capacityLabel, stepper])
         capacityStackView.axis = .horizontal
         capacityStackView.spacing = 8
         capacityStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -274,14 +280,16 @@ class NewFlightViewController: UIViewController {
             passengerIcon.heightAnchor.constraint(equalToConstant: iconSize),
             crewIcon.widthAnchor.constraint(equalToConstant: iconSize),
             crewIcon.heightAnchor.constraint(equalToConstant: iconSize),
+            capacityIcon.widthAnchor.constraint(equalToConstant: iconSize),
+            capacityIcon.heightAnchor.constraint(equalToConstant: iconSize),
             departureCalendarIcon.widthAnchor.constraint(equalToConstant: iconSize),
             departureCalendarIcon.heightAnchor.constraint(equalToConstant: iconSize),
             returnCalendarIcon.widthAnchor.constraint(equalToConstant: iconSize),
             returnCalendarIcon.heightAnchor.constraint(equalToConstant: iconSize),
-            rightArrowPassenger.widthAnchor.constraint(equalToConstant: iconSize),
-            rightArrowPassenger.heightAnchor.constraint(equalToConstant: iconSize),
-            rightArrowCrew.widthAnchor.constraint(equalToConstant: iconSize),
-            rightArrowCrew.heightAnchor.constraint(equalToConstant: iconSize),
+            rightArrowPassenger.widthAnchor.constraint(equalToConstant: iconSize2),
+            rightArrowPassenger.heightAnchor.constraint(equalToConstant: iconSize2),
+            rightArrowCrew.widthAnchor.constraint(equalToConstant: iconSize2),
+            rightArrowCrew.heightAnchor.constraint(equalToConstant: iconSize2),
             
             originStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             originStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -332,7 +340,7 @@ class NewFlightViewController: UIViewController {
             takeoffButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             takeoffButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             takeoffButton.heightAnchor.constraint(equalToConstant: 50)
-
+            
         ])
     }
     
@@ -347,11 +355,11 @@ class NewFlightViewController: UIViewController {
     }
     
     @objc private func passengerViewTapped() {
-           let passengersVC = PassengersViewController()
-           passengersVC.passengers = passengers
-           passengersVC.delegate = self
-           navigationController?.pushViewController(passengersVC, animated: true)
-       }
+        let passengersVC = PassengersViewController()
+        passengersVC.passengers = passengers
+        passengersVC.delegate = self
+        navigationController?.pushViewController(passengersVC, animated: true)
+    }
     
     @objc private func crewViewTapped() {
         let crewVC = CrewViewController()
@@ -363,83 +371,83 @@ class NewFlightViewController: UIViewController {
     }
     
     @objc private func addFlightButtonTapped() {
-           guard validateCities(),
-                 validateCrew(),
-                 validateCapacity() else {
-               return
-           }
-           
-           let origin = originTextField.text!
-           let destination = destinationTextField.text!
-           
-           let dateFormatter = DateFormatter()
-           dateFormatter.dateFormat = "yyyy-MM-dd"
-           
-           let departureDate = dateFormatter.string(from: departureDatePicker.date)
-           let returnDate = oneWaySwitch.isOn ? nil : dateFormatter.string(from: returnDatePicker.date)
-           
-           let capacity = Int(stepper.value)
-           let flight = Flight(
-               origin: origin,
-               destination: destination,
-               capacity: capacity,
-               departureDate: departureDate,
-               returnDate: returnDate,
-               pilots: pilots,
-               coPilots: coPilots,
-               flightAttendants: flightAttendants,
-               passengers: passengers
-           )
-           
-           onFlightAdded?(flight)
-        print("\(flight.departureDate), \(flight.returnDate)")
-           navigationController?.popViewController(animated: true)
-       }
-       
-       private func validateCities() -> Bool {
-           guard let origin = originTextField.text, origin.count == 3 else {
-               showAlert(title: "Erro", message: "Por favor, preencha a cidade de origem com 3 caracteres.")
-               return false
-           }
-           
-           guard let destination = destinationTextField.text, destination.count == 3 else {
-               showAlert(title: "Erro", message: "Por favor, preencha a cidade de destino com 3 caracteres.")
-               return false
-           }
-           
-           return true
-       }
-       
-       private func validateCrew() -> Bool {
-           if pilots.count != 1 {
-               showAlert(title: "Erro", message: "É necessário ter exatamente 1 piloto.")
-               return false
-           }
-           
-           if coPilots.count != 1 {
-               showAlert(title: "Erro", message: "É necessário ter exatamente 1 co-piloto.")
-               return false
-           }
-           
-           if flightAttendants.count < 1 || flightAttendants.count > 3 {
-               showAlert(title: "Erro", message: "O voo deve ter entre 1 e 3 comissários.")
-               return false
-           }
-           
-           return true
-       }
-       
-       private func validateCapacity() -> Bool {
-           let totalPeople = pilots.count + coPilots.count + flightAttendants.count + passengers.count
-           let capacity = Int(stepper.value)
-           
-           if capacity < totalPeople {
-               showAlert(title: "Erro", message: "A capacidade do voo foi excedida.")
-               return false
-           }
-           
-           return true
-       }
+        guard validateCities(),
+              validateCrew(),
+              validateCapacity() else {
+            return
+        }
+        
+        let origin = originTextField.text!
+        let destination = destinationTextField.text!
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let departureDate = dateFormatter.string(from: departureDatePicker.date)
+        
+        let returnDate = oneWaySwitch.isOn ? nil : dateFormatter.string(from: returnDatePicker.date)
+        
+        let flight = Flight(
+            origin: origin,
+            destination: destination,
+            capacity: Int(stepper.value),
+            departureDate: departureDate,
+            returnDate: returnDate,
+            pilots: pilots,
+            coPilots: coPilots,
+            flightAttendants: flightAttendants,
+            passengers: passengers
+        )
+        
+        onFlightAdded?(flight)
+        print("\(flight.departureDate), \(String(describing: flight.returnDate))")
+        navigationController?.popViewController(animated: true)
+    }
+    
+    private func validateCities() -> Bool {
+        guard let origin = originTextField.text, origin.count == 3 else {
+            showAlert(title: "Erro", message: "Por favor, preencha a cidade de origem com 3 caracteres.")
+            return false
+        }
+        
+        guard let destination = destinationTextField.text, destination.count == 3 else {
+            showAlert(title: "Erro", message: "Por favor, preencha a cidade de destino com 3 caracteres.")
+            return false
+        }
+        
+        return true
+    }
+    
+    private func validateCrew() -> Bool {
+        if pilots.count != 1 {
+            showAlert(title: "Erro", message: "É necessário ter exatamente 1 piloto.")
+            return false
+        }
+        
+        if coPilots.count != 1 {
+            showAlert(title: "Erro", message: "É necessário ter exatamente 1 co-piloto.")
+            return false
+        }
+        
+        if flightAttendants.count < 1 || flightAttendants.count > 3 {
+            showAlert(title: "Erro", message: "O voo deve ter entre 1 e 3 comissários.")
+            return false
+        }
+        
+        return true
+    }
+    
+    private func validateCapacity() -> Bool {
+        let totalPeople = pilots.count + coPilots.count + flightAttendants.count + passengers.count
+        let capacity = Int(stepper.value)
+        
+        if capacity < totalPeople {
+            showAlert(title: "Erro", message: "A capacidade do voo foi excedida.")
+            return false
+        }
+        
+        return true
+    }
     
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -456,7 +464,7 @@ extension NewFlightViewController: PassengersViewControllerDelegate {
         self.passengers = passengers
         updatePassengerLabel()
     }
-
+    
     private func updatePassengerLabel() {
         if passengers.isEmpty {
             passengerLabel.text = "Nenhum passageiro adicionado"

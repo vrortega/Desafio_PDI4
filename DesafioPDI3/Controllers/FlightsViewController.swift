@@ -172,22 +172,19 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         let flight = flights[indexPath.row]
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" 
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         
         var departureDateString = "Data inválida"
-        var returnDateString: String? = nil
-        
         if let departureDate = dateFormatter.date(from: flight.departureDate) {
             dateFormatter.dateStyle = .medium
             departureDateString = dateFormatter.string(from: departureDate)
         }
-        
+                var returnDateString: String? = nil
         if let returnDateStr = flight.returnDate, let returnDate = dateFormatter.date(from: returnDateStr) {
             returnDateString = dateFormatter.string(from: returnDate)
         }
         
         var detailText: String
-        
         if let returnDateString = returnDateString {
             detailText = "Ida: \(departureDateString) - Volta: \(returnDateString) | \(flight.passengers.count) passageiro(s)"
         } else {
@@ -224,36 +221,28 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        fetchWeather(for: location.coordinate)
+        Task {
+            await fetchWeather(for: location.coordinate)
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to get location: \(error)")
     }
     
-    private func fetchWeather(for coordinate: CLLocationCoordinate2D) {
+    private func fetchWeather(for coordinate: CLLocationCoordinate2D) async {
         let apiKey = "ce0b023afe564606bb6232253243007"
         let urlString = "https://api.weatherapi.com/v1/current.json?key=\(apiKey)&q=\(coordinate.latitude),\(coordinate.longitude)"
         
         guard let url = URL(string: urlString) else { return }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Failed to fetch weather data: \(String(describing: error))")
-                return
-            }
-            
-            do {
-                let weatherResponse = try JSONDecoder().decode(WeatherResponse.self, from: data)
-                DispatchQueue.main.async {
-                    self.updateWeatherView(with: weatherResponse)
-                }
-            } catch {
-                print("Failed to decode weather data: \(error)")
-            }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let weatherResponse = try JSONDecoder().decode(WeatherResponse.self, from: data)
+            updateWeatherView(with: weatherResponse)
+        } catch {
+            print("Failed to fetch weather data: \(error)")
         }
-        
-        task.resume()
     }
     
     private func updateWeatherView(with weatherResponse: WeatherResponse) {

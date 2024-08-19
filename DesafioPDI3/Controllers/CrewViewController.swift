@@ -104,22 +104,41 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         experienceStackView.spacing = 8
         experienceStackView.translatesAutoresizingMaskIntoConstraints = false
         
-        let stackView = UIStackView(arrangedSubviews: [roleSegmentedControl, nameTextField, experienceStackView, embarkButton, noCrewLabel, crewTableView])
-        stackView.axis = .vertical
-        stackView.spacing = 16
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(stackView)
-        
+        view.addSubview(roleSegmentedControl)
+        view.addSubview(nameTextField)
+        view.addSubview(experienceStackView)
+        view.addSubview(embarkButton)
+        view.addSubview(noCrewLabel)
+        view.addSubview(crewTableView)
+
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
+            roleSegmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            roleSegmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            roleSegmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             roleSegmentedControl.heightAnchor.constraint(equalToConstant: 35),
+            
+            nameTextField.topAnchor.constraint(equalTo: roleSegmentedControl.bottomAnchor, constant: 16),
+            nameTextField.leadingAnchor.constraint(equalTo: roleSegmentedControl.leadingAnchor),
+            nameTextField.trailingAnchor.constraint(equalTo: roleSegmentedControl.trailingAnchor),
             nameTextField.heightAnchor.constraint(equalToConstant: 35),
+            
+            experienceStackView.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 16),
+            experienceStackView.leadingAnchor.constraint(equalTo: roleSegmentedControl.leadingAnchor),
+            experienceStackView.trailingAnchor.constraint(equalTo: roleSegmentedControl.trailingAnchor),
+            
+            embarkButton.topAnchor.constraint(equalTo: experienceStackView.bottomAnchor, constant: 16),
+            embarkButton.leadingAnchor.constraint(equalTo: roleSegmentedControl.leadingAnchor),
+            embarkButton.trailingAnchor.constraint(equalTo: roleSegmentedControl.trailingAnchor),
             embarkButton.heightAnchor.constraint(equalToConstant: 44),
-            crewTableView.heightAnchor.constraint(equalToConstant: 200)
+            
+            noCrewLabel.topAnchor.constraint(equalTo: embarkButton.bottomAnchor, constant: 16),
+            noCrewLabel.leadingAnchor.constraint(equalTo: roleSegmentedControl.leadingAnchor),
+            noCrewLabel.trailingAnchor.constraint(equalTo: roleSegmentedControl.trailingAnchor),
+            
+            crewTableView.topAnchor.constraint(equalTo: embarkButton.bottomAnchor, constant: 15),
+            crewTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0),
+            crewTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0),
+            crewTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0)
         ])
     }
     
@@ -135,6 +154,12 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let isPilotSelected = selectedIndex == 0
         experienceLabel.isEnabled = isPilotSelected
         experienceStepper.isEnabled = isPilotSelected
+        
+        if isPilotSelected {
+            experienceLabel.text = "Experiência: \(Int(experienceStepper.value)) ano(s)"
+        } else {
+            experienceLabel.text = "Experiência mínima nao requerida"
+        }
     }
     
     @objc private func embarkButtonTapped() {
@@ -148,7 +173,7 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let experience = Int(experienceStepper.value)
         
         if roleSegmentedControl.selectedSegmentIndex == 0 {
-            if experience > 5 {
+            if experience >= 5 {
                 let newPilot = Pilot(name: name, experience: experience)
                 pilots.append(newPilot)
             } else {
@@ -161,7 +186,7 @@ class CrewViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         
         nameTextField.text = ""
-        experienceStepper.value = 1
+        experienceStepper.value = 0
         stepperValueChanged()
         
         updateUI(for: roleSegmentedControl.selectedSegmentIndex)

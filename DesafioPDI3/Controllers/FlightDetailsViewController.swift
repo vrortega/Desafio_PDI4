@@ -84,40 +84,50 @@ class FlightDetailsViewController: UIViewController {
     private func configureViews() {
         guard let flight = flight else { return }
 
-        // Exibir origem -> destino com um emoji de seta entre eles
         let originLabel = UILabel()
         originLabel.text = flight.origin
-        originLabel.font = .systemFont(ofSize: 50, weight: .bold)
+        originLabel.font = .systemFont(ofSize: 70, weight: .bold)
 
-        let arrowLabel = UILabel()
-        arrowLabel.text = "→"
-        arrowLabel.font = .systemFont(ofSize: 40, weight: .bold)
+        let arrowImageView = UIImageView(image: UIImage(systemName: "arrow.left.arrow.right"))
+        arrowImageView.contentMode = .scaleAspectFit
+        arrowImageView.translatesAutoresizingMaskIntoConstraints = false
+        arrowImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        arrowImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
 
         let destinationLabel = UILabel()
         destinationLabel.text = flight.destination
-        destinationLabel.font = .systemFont(ofSize: 50, weight: .bold)
+        destinationLabel.font = .systemFont(ofSize: 70, weight: .bold)
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-
-        let departureDateLabel = UILabel()
-        departureDateLabel.text = "Data de ida: \(flight.departureDate)"
-
-        let returnDateLabel = UILabel()
-        returnDateLabel.text = "Data de volta: \(String(describing: flight.returnDate))"
-
-        // StackView para origem -> destino
-        let originDestinationStackView = UIStackView(arrangedSubviews: [originLabel, arrowLabel, destinationLabel])
+        let originDestinationStackView = UIStackView(arrangedSubviews: [originLabel, arrowImageView, destinationLabel])
         originDestinationStackView.axis = .horizontal
         originDestinationStackView.alignment = .center
-        originDestinationStackView.spacing = 8
+        originDestinationStackView.spacing = 4
+        originDestinationStackView.distribution = .equalSpacing
 
-        // StackView para data de ida e volta
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/yy"
+
+        let departureDate = dateFormatter.date(from: flight.departureDate) ?? Date()
+        let formattedDepartureDate = dateFormatter.string(from: departureDate)
+        let departureDateLabel = UILabel()
+        departureDateLabel.text = "Ida: \(formattedDepartureDate)"
+        departureDateLabel.font = .systemFont(ofSize: 14, weight: .regular)
+
+
+        let returnDateText = flight.returnDate != nil ? flight.returnDate : ""
+        let returnDate = dateFormatter.date(from: returnDateText ?? "") ?? Date()
+        let formattedReturnDate = dateFormatter.string(from: returnDate)
+        let returnDateLabel = UILabel()
+        returnDateLabel.text = returnDateText != "" ? "Volta: \(formattedReturnDate)" : ""
+        returnDateLabel.font = .systemFont(ofSize: 14, weight: .regular)
+
         let datesStackView = UIStackView(arrangedSubviews: [departureDateLabel, returnDateLabel])
         datesStackView.axis = .vertical
+        datesStackView.alignment = .center
         datesStackView.spacing = 8
+        
+        flightInfoView.addSubview(datesStackView)
 
-        // StackView final combinando todas as informações do voo
         let flightInfoStackView = UIStackView(arrangedSubviews: [originDestinationStackView, datesStackView])
         flightInfoStackView.axis = .vertical
         flightInfoStackView.spacing = 16
@@ -133,7 +143,7 @@ class FlightDetailsViewController: UIViewController {
         ])
 
         let passengersLabel = UILabel()
-        passengersLabel.text = "Passageiros:"
+        passengersLabel.text = "Passageiros | Capacidade: \(flight.capacity)"
         passengersLabel.font = .systemFont(ofSize: 18, weight: .bold)
 
         let passengersStackView = UIStackView(arrangedSubviews: [passengersLabel])
@@ -157,13 +167,31 @@ class FlightDetailsViewController: UIViewController {
         ])
 
         let crewLabel = UILabel()
-        crewLabel.text = "Tripulação:"
+        crewLabel.text = "Tripulação"
         crewLabel.font = .systemFont(ofSize: 18, weight: .bold)
 
         let crewStackView = UIStackView(arrangedSubviews: [crewLabel])
         crewStackView.axis = .vertical
         crewStackView.spacing = 8
         crewStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        for pilot in flight.pilots {
+            let pilotLabel = UILabel()
+            pilotLabel.text = "Piloto: \(pilot.name)"
+            crewStackView.addArrangedSubview(pilotLabel)
+        }
+
+        for coPilot in flight.coPilots {
+            let coPilotLabel = UILabel()
+            coPilotLabel.text = "Co-Piloto: \(coPilot.name)"
+            crewStackView.addArrangedSubview(coPilotLabel)
+        }
+
+        for attendant in flight.flightAttendants {
+            let attendantLabel = UILabel()
+            attendantLabel.text = "Comissário: \(attendant.name)"
+            crewStackView.addArrangedSubview(attendantLabel)
+        }
 
         crewView.addSubview(crewStackView)
 
@@ -175,4 +203,3 @@ class FlightDetailsViewController: UIViewController {
         ])
     }
 }
-
