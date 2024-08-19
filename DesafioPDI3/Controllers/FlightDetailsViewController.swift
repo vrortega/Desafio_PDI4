@@ -86,17 +86,17 @@ class FlightDetailsViewController: UIViewController {
 
         let originLabel = UILabel()
         originLabel.text = flight.origin
-        originLabel.font = .systemFont(ofSize: 70, weight: .bold)
+        originLabel.font = .systemFont(ofSize: 50, weight: .bold)
 
         let arrowImageView = UIImageView(image: UIImage(systemName: "arrow.left.arrow.right"))
         arrowImageView.contentMode = .scaleAspectFit
         arrowImageView.translatesAutoresizingMaskIntoConstraints = false
-        arrowImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        arrowImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        arrowImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        arrowImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
 
         let destinationLabel = UILabel()
         destinationLabel.text = flight.destination
-        destinationLabel.font = .systemFont(ofSize: 70, weight: .bold)
+        destinationLabel.font = .systemFont(ofSize: 50, weight: .bold)
 
         let originDestinationStackView = UIStackView(arrangedSubviews: [originLabel, arrowImageView, destinationLabel])
         originDestinationStackView.axis = .horizontal

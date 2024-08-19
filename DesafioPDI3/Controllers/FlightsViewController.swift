@@ -44,16 +44,12 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
-        
-        print("FlightsViewController - viewDidLoad: \(flights.count) voos")
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
         updateNoFlightsLabel()
-        
-        print("FlightsViewController - viewWillAppear: \(flights.count) voos")
         
     }
     
@@ -171,17 +167,19 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         let flight = flights[indexPath.row]
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let parseFormatter = DateFormatter()
+        parseFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
         
         var departureDateString = "Data inválida"
-        if let departureDate = dateFormatter.date(from: flight.departureDate) {
-            dateFormatter.dateStyle = .medium
-            departureDateString = dateFormatter.string(from: departureDate)
+        if let departureDate = parseFormatter.date(from: flight.departureDate) {
+            departureDateString = displayFormatter.string(from: departureDate)
         }
-                var returnDateString: String? = nil
-        if let returnDateStr = flight.returnDate, let returnDate = dateFormatter.date(from: returnDateStr) {
-            returnDateString = dateFormatter.string(from: returnDate)
+                var returnDateString: String?
+        if let returnDateStr = flight.returnDate, !returnDateStr.isEmpty, let returnDate = parseFormatter.date(from: returnDateStr) {
+            returnDateString = displayFormatter.string(from: returnDate)
         }
         
         var detailText: String
@@ -190,8 +188,7 @@ class FlightsViewController: UIViewController, UITableViewDelegate, UITableViewD
         } else {
             detailText = "Ida: \(departureDateString) - Somente ida | \(flight.passengers.count) passageiro(s)"
         }
-        
-        cell.textLabel?.text = "\(flight.origin) - \(flight.destination)"
+                cell.textLabel?.text = "\(flight.origin) - \(flight.destination)"
         cell.detailTextLabel?.text = detailText
         
         return cell

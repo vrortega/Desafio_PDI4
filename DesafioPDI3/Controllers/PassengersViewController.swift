@@ -19,6 +19,7 @@ class PassengersViewController: UIViewController, UITableViewDataSource, UITable
         let textField = UITextField()
         textField.placeholder = "Nome"
         textField.borderStyle = .roundedRect
+        textField.keyboardType = .alphabet
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
