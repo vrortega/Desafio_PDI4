@@ -199,6 +199,7 @@ class NewFlightViewController: UIViewController {
 
         let capacityIcon = UIImageView(image: UIImage(systemName: "person.3.fill"))
         capacityIcon.tintColor = .black
+        capacityIcon.contentMode = .scaleAspectFit
         capacityIcon.translatesAutoresizingMaskIntoConstraints = false
 
         let crewIcon = UIImageView(image: UIImage(systemName: "person.fill"))
@@ -223,11 +224,13 @@ class NewFlightViewController: UIViewController {
 
         let originStackView = UIStackView(arrangedSubviews: [originIcon, originTextField])
         originStackView.axis = .horizontal
+        originStackView.alignment = .center
         originStackView.spacing = 8
         originStackView.translatesAutoresizingMaskIntoConstraints = false
 
         let destinationStackView = UIStackView(arrangedSubviews: [destinationIcon, destinationTextField])
         destinationStackView.axis = .horizontal
+        destinationStackView.alignment = .center
         destinationStackView.spacing = 8
         destinationStackView.translatesAutoresizingMaskIntoConstraints = false
 
