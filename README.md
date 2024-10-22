@@ -1,26 +1,15 @@
-<div align="center"><h1>PDI 3 🛬</div></h1>
+<div align="center"><h1>PDI 4 🛬</div></h1>
 
 ## ✈️ Introdução
-Este projeto é um aplicativo de gerenciamento de voos que permite aos usuários cadastrar passageiros, tripulantes e adicionar voos. O app possui integração com uma API de clima, que verifica automaticamente as condições meteorológicas do local atual do dispositivo. O app foi desenvolvido em **UIKit**, sem o uso de Storyboards, com todos os elementos criados programaticamente.
+Este projeto é uma aplicação de agendamento de voos desenvolvida usando a arquitetura MVVM (Model-View-ViewModel) em Swift. A aplicação permite criar, visualizar e gerenciar voos, passageiros e tripulação, utilizando uma interface simples.
 
 
-## 📁 Estrutura das Pastas
-```css
-├── 📁 Controllers
-│   ├── 📄 FlightsViewController.swift
-│   ├── 📄 NewFlightViewController.swift
-│   ├── 📄 FlightDetailsViewController.swift
-│   ├── 📄 CrewViewController.swift
-│   └── 📄 PassengersViewController.swift
-├── 📁 Models
-│   ├── 📄 Passenger.swift
-│   ├── 📄 Pilot.swift
-│   ├── 📄 FlightAttendant.swift
-│   ├── 📄 Flight.swift
-│   └── 📄 WeatherResponse.swift
-└── 📄 AppDelegate.swift
-└── 📄 SceneDelegate.swift
-```
+## 📁 Estrutura do projeto
+O projeto segue a arquitetura MVVM, dividindo a lógica da aplicação em três principais componentes:
+
+<li>Model: Representa as entidades e dados do aplicativo, como Flight, Passenger, Pilot, etc.</li>
+<li>ViewModel: Faz a intermediação entre a View e o Model, processando os dados e aplicando regras de negócios.</li>
+<li>View: Composta pelas ViewControllers que exibem os dados processados pelo ViewModel e gerenciam as interações do usuário.</li>
 
 ## 🎯 Finalidade do Projeto
 A finalidade deste projeto é fornecer uma ferramenta prática para o gerenciamento de voos. Ele permite:
@@ -37,13 +26,13 @@ A finalidade deste projeto é fornecer uma ferramenta prática para o gerenciame
 ### Clone o repositório:
 
 ```sh
-git clone https://github.com/vrortega/Desafio_PDI3.git
-cd Desafio_PDI3
+git clone https://github.com/vrortega/Desafio_PDI4
+cd Desafio_PDI4
 ```
 
 * **Abra o Projeto no Xcode:**
 
-Navegue até o arquivo `Desafio_PDI3.xcodeproj` e abra-o com o Xcode.
+Navegue até o arquivo `Desafio_PDI4.xcodeproj` e abra-o com o Xcode.
 
 * **Instale as Dependências:**
 
